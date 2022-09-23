@@ -189,24 +189,24 @@
 
 \subsubsection{bc-type设置规则}\label{bc-type}
 \begin{enumerate}[label=\arabic*).]
-  \item \lstinline{2}: interior;
-  \item \lstinline{3}: wall;
-  \item \lstinline{4}: pressure-inlet, inlet-vent, intake-fan;
-  \item \lstinline{5}: pressure-outlet, outlet-vent, exhaust-fan;
-  \item \lstinline{7}: symmetry;
-  \item \lstinline{8}: periodic-shadow;
-  \item \lstinline{9}: pressure-far-field;
-  \item \lstinline{10}: velocity-inlet;
-  \item \lstinline{12}: periodic; 
-  \item \lstinline{14}: fan, porous-jump, radiztor;
-  \item \lstinline{20}: mass-flow-inlet;
-  \item \lstinline{24}: Interface;
-  \item \lstinline{31}: parent(hanging node);
-  \item \lstinline{36}: outflow;
-  \item \lstinline{37}: axis.
+  \item \lstinline{2(Ox2)}: interior;
+  \item \lstinline{3(Ox3)}: wall;
+  \item \lstinline{4(Ox4)}: pressure-inlet, inlet-vent, intake-fan;
+  \item \lstinline{5(Ox5)}: pressure-outlet, outlet-vent, exhaust-fan;
+  \item \lstinline{7(Ox7)}: symmetry;
+  \item \lstinline{8(Ox8)}: periodic-shadow;
+  \item \lstinline{9(Ox9)}: pressure-far-field;
+  \item \lstinline{10(Oxa)}: velocity-inlet;
+  \item \lstinline{12(Oxc)}: periodic; 
+  \item \lstinline{14(Oxe)}: fan, porous-jump, radiztor;
+  \item \lstinline{20(Ox14)}: mass-flow-inlet;
+  \item \lstinline{24(Ox18)}: Interface;
+  \item \lstinline{31(Ox1f)}: parent(hanging node);
+  \item \lstinline{36(Ox24)}: outflow;
+  \item \lstinline{37(Ox25)}: axis.
 \end{enumerate}
 
-\textbf{注意}：非共形网格相交的交界面被存放在一个单独的面区域中。这些面区域的bc-type增加了1000(例如bc-type = 1003是wall)；这里的标号要转16进制。
+\textbf{注意}：非共形网格相交的交界面被存放在一个单独的面区域中。这些面区域的bc-type增加了1000(例如bc-type = 1003是wall)；这里所写的边界条件的标号要转16进制。
 
 \subsubsection{face-type设置规则}\label{face-type}
 \begin{enumerate}[label=\arabic*).]
@@ -220,15 +220,41 @@
 \subsubsection{点、面、单元关系格式}
 \begin{lstlisting}
   {面关系格式}：(n0 n1 n2 c0 c1)
-  {格式解释}：n*表示节点编号，对于2维网格，n2不显示；
+  {格式解释}：n*表示节点编号，其最大标号与face-type相关；
              c*表示face的邻近cell编号，c0按右手法则确定，c1在face的另一边；
 \end{lstlisting}
 
 对于二维情况，假设存在一个指向平面外的$\overrightarrow{k}$，通过$\overrightarrow{k}\times\overrightarrow{r}$来确定c0；在边界处c0或c1为0。
 
-当网格为混合类型(face-type = 0)或多边体类型(face-type = 5)，每一行说明面的语句应以节点数目开头：
+当网格为混合类型(face-type = 0)或多边形类型(face-type = 5)，每一行说明面的语句应以节点数目开头：
 \begin{lstlisting}
   (x n0 n1 ... nf c0 c1) 
+\end{lstlisting}
+
+\subsection{Face Tree}\label{Face-Tree}
+\begin{lstlisting}
+  {区域格式}：(59 (face-id0 face-id1 parent-zone-id child-zone-id)
+                 (number-of-kids kid-id-0 kid-id-1 ... kid-id-n))
+  {格式解释}：59为指令标号；
+             face-id0为区域第一个父级面的编号；
+             face-id1为区域最后一个父级面的编号；
+             parent-zone-id为父级面所在区域id；
+             child-zone-id为子级面所在区域id；
+             number-of-kids为子级面的数量；
+             kid-id-n为子级面的编号。
+\end{lstlisting}
+
+\subsection{Cell Tree}\label{Cell-Tree}
+\begin{lstlisting}
+  {区域格式}：(58 (cell-id0 cell-id1 parent-zone-id child-zone-id)
+                 (number-of-kids kid-id-0 kid-id-1 ... kid-id-n))
+  {格式解释}：58为指令标号；
+             cell-id0为区域第一个父级单元的编号；
+             cell-id1为区域最后一个父级单元的编号；
+             parent-zone-id为父级单元所在区域id；
+             child-zone-id为子级单元所在区域id；
+             number-of-kids为子级单元的数量；
+             kid-id-n为子级单元的编号。
 \end{lstlisting}
 
 \subsection{Zone 区域}\label{Zone}
@@ -262,7 +288,7 @@
 
 \section{三维msh文本文件示例}
 
-三维网格以 $2\times2\times2$ 为例，其形状如图 \ref{3dMesh} 所示：
+三维网格以 $2\times2\times2$ 立方体为例，边长为2，其形状如图 \ref{3dMesh} 所示：
 \begin{figure}[!htb]
 \centering
 \includegraphics[width=0.5\textwidth]{3d.png}
@@ -360,6 +386,89 @@
   (39 (1 pressure-far-field FAR)()) ------------ %自定义编号1
 \end{lstlisting}
 
+\section{Mesh with Hanging Nodes(搭接网格)}
+
+这里直接给出Fluent用户手册中的例子。
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.6\textwidth]{hanging.png}
+  \caption{网格示例}
+  \label{hanging}
+  \end{figure}
+\begin{lstlisting}
+  (0 "Grid:")
+  (0 "Dimensions:")
+  (2 2)
+  (12 (0 1 7 0))
+  (13 (0 1 16 0))
+  (10 (0 1 d 0 2))
+  (12 (7 1 6 1 3))
+  (12 (1 7 7 20 3))
+  (58 (7 7 1 7)(
+  4 6 5 4 3))
+  (13 (2 1 7 2 2)(
+  1 2 6 3 
+  1 3 3 4 
+  1 4 4 5 
+  1 5 5 6 
+  6 7 1 2 
+  5 8 2 6 
+  9 5 2 5))
+  (13 (3 8 b 3 2)(
+  a 6 1 0 
+  6 9 2 0 
+  4 b 4 0 
+  9 4 5 0))
+  (13 (4 c f 3 2)(
+  2 8 6 0 
+  c 2 3 0 
+  8 7 2 0 
+  7 d 1 0))
+  (13 (5 10 10 a 2)(
+  d a 1 0))
+  (13 (6 11 12 24 2)(
+  3 c 3 0 
+  b 3 4 0))
+  (13 (b 13 13 1f 2)(
+  c 8 7 0))
+  (13 (a 14 14 1f 2)(
+  b c 7 0))
+  (13 (9 15 15 1f 2)(
+  9 b 7 0))
+  (13 (8 16 16 1f 2)(
+  9 8 2 7))
+  (59 (13 13 b 4)(
+  2 d c))
+  (59 (14 14 a 6)(
+  2 12 11))
+  (59 (15 15 9 3)(
+  2 b a))
+  (59 (16 16 8 2)(
+  2 7 6))
+  (10 (1 1 d 1 2)
+  (
+  2.50000000e+00 5.00000000e-01
+  2.50000000e+00 1.00000000e+00
+  3.00000000e+00 5.00000000e-01
+  2.50000000e+00 0.00000000e+00
+  2.00000000e+00 5.00000000e-01
+  1.00000000e+00 0.00000000e+00
+  1.00000000e+00 1.00000000e+00
+  2.00000000e+00 1.00000000e+00
+  2.00000000e+00 0.00000000e+00
+  0.00000000e+00 0.00000000e+00
+  3.00000000e+00 0.00000000e+00
+  3.00000000e+00 1.00000000e+00
+  0.00000000e+00 1.00000000e+00))
+\end{lstlisting}
+
+需要注意的事项：
+\begin{enumerate}
+  \item hanging node存在时要注意相应cell和face头文字段的内容。举例来说，在上述示例中可以认为在细网格区外存在一个大cell，包裹4个小cells；
+  \item 通过Star CCM+的切割体网格生成器(Trimmed Mesher)生成的网格,转换为Fluent msh后，face-type(面类型)被识别为polygonal(多边形)，element-type(单元类型)被识别为polyhedral(多面体)。
+\end{enumerate}
+
+
 \section{附录}
 
 \subsection{Index检索}
@@ -374,8 +483,8 @@
   \item \lstinline{13}: Faces\upref{Faces}, -required;
   \item \lstinline{18}: Periodic Shadow Faces, -required with periodic boundaries;
   \item \lstinline{39 or 45}: Zone\upref{Zone}, -required;(当有边界条件时必须用39)
-  \item \lstinline{58}: Cell Tree, only for grids with hanging-node adaption;
-  \item \lstinline{59}: Face Tree, only for grids with hanging-node adaption;
+  \item \lstinline{58}: Cell Tree\upref{Cell-Tree}, only for grids with hanging-node adaption;
+  \item \lstinline{59}: Face Tree\upref{Face-Tree}, only for grids with hanging-node adaption;
   \item \lstinline{61}: Interface Face Parents, only for grids with non-conformal Interfaces.
 \end{enumerate}
 
