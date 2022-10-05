@@ -1,4 +1,4 @@
-# Fluent_mesh_format
+# Fluent-mesh-format
 
 ## 项目简介
 Fluent_mesh文件的格式说明
