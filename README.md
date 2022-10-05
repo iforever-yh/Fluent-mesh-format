@@ -13,3 +13,5 @@ elegantpaper
 ```
 \newcommand{\upref}[1]{\textsuperscript{\ref{#1}}}
 ```
+
+2.修改了maketitle的内容及格式
