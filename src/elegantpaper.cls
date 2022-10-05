@@ -220,7 +220,12 @@
   \renewcommand\figurename{图} %
   \renewcommand\tablename{表}%
   \newcommand\versiontext{版本：}%
+  % add
   \newcommand\updatetext{日期：}%
+  \newcommand\updatenotetext{更新说明：}%
+  \newcommand\authortext{作者：}%
+  \newcommand\purposetext{目的：}%
+  % add
   \newcommand{\ebibname}{参考文献}
   \renewcommand\abstractname{摘\hspace{2em}要}
   \setlength\parindent{2\ccwd}
@@ -275,7 +280,9 @@
   \ifx\1\empty
 }
 \newtoks\version
-\newtoks\institute
+\newtoks\purpose
+\newtoks\updatenote
+\newtoks\author
 
 \renewcommand\maketitle{\par
   \begingroup
@@ -302,12 +309,12 @@
   \global\let\maketitle\relax
   \global\let\@maketitle\relax
   \global\let\@thanks\@empty
-  \global\let\@author\@empty
+  %\global\let\@author\@empty
   \global\let\@ELEGANT@version\@empty
   \global\let\@date\@empty
   \global\let\@title\@empty
   \global\let\title\relax
-  \global\let\author\relax
+  %\global\let\author\relax
   \global\let\date\relax
   \global\let\and\relax
   \global\let\ELEGANT@version\relax
@@ -320,27 +327,42 @@
   \let \footnote \thanks
     {\LARGE\bfseries \@title \par}%
     \vskip 1.5em%
-    {\large
-      \lineskip .5em%
-      \begin{tabular}[t]{c}%
-        \@author\\[1ex]
-      \end{tabular}\par}
-      \the\institute%
-\vskip 0.5ex%
-\IfEmpty\version
-\else 
-{\small\normalfont\citshape\versiontext\the\version}
-\fi
-\ifx\@date\empty
-\else
-\vskip 0.1em%
- {\small\normalfont\citshape\updatetext\@date}%
-\fi
+    % {\large
+    %   \lineskip .5em%
+    %   \begin{tabular}[t]{c}%
+    %     \@author\\[1ex]
+    %   \end{tabular}\par}
   \end{center}%
+  \begin{l}%
+    \vskip 0.5ex%
+    \IfEmpty\author
+    \else 
+    {\small\normalfont\citshape\authortext\the\author}
+    \fi  
+    \vskip 0.5ex%
+    \IfEmpty\purpose
+    \else 
+    {\small\normalfont\citshape\purposetext\the\purpose}
+    \fi
+    \vskip 0.5ex%
+    \IfEmpty\version
+    \else 
+    {\small\normalfont\citshape\versiontext\the\version}
+    \fi
+    \vskip 0.5ex%
+    \IfEmpty\updatenote
+    \else 
+    {\small\normalfont\citshape\updatenotetext\the\updatenote}
+    \fi
+    \ifx\@date\empty
+    \else
+    \vskip 0.1em%
+    {\small\normalfont\citshape\updatetext\@date}%
+    \fi
+  \end{l}%
   \par
 }
   
-
 \RequirePackage{listings}
 \renewcommand{\ttdefault}{cmtt}
 
@@ -360,7 +382,7 @@
 	commentstyle=\color{commentcolor},
 	emph={elegantpaper,fontenc,fontspec,xeCJK,FiraMono,xunicode,newtxmath,figure,fig,image,img,table,itemize,enumerate,newtxtext,newtxtt,ctex,microtype,description,times,newtx,booktabs,tabular,PDFLaTeX,XeLaTeX,type1cm,BibTeX,cite,gbt7714,lang},
 	emphstyle={\color{frenchplum}},
-	morekeywords={DeclareSymbolFont,SetSymbolFont,toprule,midrule,bottomrule,institute,version,includegraphics,setmainfont,setsansfont,setmonofont ,setCJKmainfont,setCJKsansfont,setCJKmonofont,RequirePackage,figref,tabref,email,maketitle,keywords,zhdate,zhtoday},
+	morekeywords={DeclareSymbolFont,SetSymbolFont,toprule,midrule,bottomrule,version,includegraphics,setmainfont,setsansfont,setmonofont ,setCJKmainfont,setCJKsansfont,setCJKmonofont,RequirePackage,figref,tabref,email,maketitle,keywords,zhdate,zhtoday},
 	tabsize=2,
 	backgroundcolor=\color{lightgrey}
 }
